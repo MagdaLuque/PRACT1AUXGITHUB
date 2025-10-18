@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador digimon</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <p>Nombre: Magdalena Luque Mamani C.I.: 13087255</p>
+    <h1>Buscador de Digimon</h1>
+
+    <p>
+        <strong>Algunos Nombres</strong><br>
+        Agumon, Gabumon, Patamon, Gatomon, Greymon, MetalGreymon, WarGreymon, 
+        Veemon, Flamedramon, Omnimon, Tentomon, Palmon, Togemon, Lillymon, Rosemon, 
+        Wormmon, Stingmon, Paildramon, Imperialdramon, Hawkmon, Halsemon, 
+        Armadillomon, Ankylomon, Shakkoumon, Magnamon, DemiDevimon, Devimon, 
+        Myotismon, VenomMyotismon, BlackAgumon, BlackGreymon, BlackMetalGreymon, 
+        BlackWarGreymon, Biyomon, Birdramon, Garudamon, Phoenixmon, Elecmon, 
+        Leomon, SaberLeomon, Zudomon, Ikkakumon, Vikemon, Gomamon, Salamon, 
+        Angewomon, Nefertimon, Pegasusmon, Angemon, Seraphimon, ExVeemon, 
+        Raidramon, Silphymon, Aquilamon, Golemon, Centarumon, Andromon, Datamon, 
+        Etemon, SkullGreymon, Machinedramon, Piedmon, Apocalymon
+    </p>
+
+    <p>
+        <strong>Niveles:</strong><br>
+        Champion, Ultimate, Mega, Armor, Fresh, In Training, Rookie
+    </p>
+
+    <div class="busqueda">
+        <input type="text" id="busqueda" placeholder="Nombre o nivel">
+        <select id="tipo">
+            <option value="todos">Todos</option>
+            <option value="nombre">Por nombre</option>
+            <option value="nivel">Por nivel</option>
+        </select>
+        <button onclick="buscarDigimon()">Buscar</button>
+    </div>
+
+    <table id="tabla">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Nivel</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        async function buscarDigimon() {
+        const valor = document.getElementById('busqueda').value.toLowerCase();
+        const tipo = document.getElementById('tipo').value;
+        let url = '';
+
+        if (tipo === 'todos') {
+            url = `https://digimon-api.vercel.app/api/digimon`;
+        } else if (tipo === 'nombre') {
+            url = `https://digimon-api.vercel.app/api/digimon/name/${valor}`;
+        } else if (tipo === 'nivel') {
+            url = `https://digimon-api.vercel.app/api/digimon/level/${valor}`;
+        }
+
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+
+            const tbody = document.querySelector('#tabla tbody');
+            tbody.innerHTML = '';
+
+            data.forEach(d => {
+                const fila = `<tr><td>${d.name}</td><td>${d.level}</td></tr>`;
+                tbody.innerHTML += fila;
+            });
+        } catch (error) {
+            alert("No se encontraron resultados.");
+        }
+    }
+    </script>
+</body>
+</html>
