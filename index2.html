@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria Pokemon</title>
+    <link rel="stylesheet" href="estilos2.css">
+</head>
+<body>
+    <p class="nom">Nombre: Magdalena Luque Mamani C.I.: 13087255</p>
+
+    <h1>Galeria Pokemon</h1>
+
+    <div class="busqueda">
+        <input type="text" id="filtro" placeholder="Buscar Pokemon por nombre">
+        <button onclick="buscarPokemon()">Buscar</button>
+    </div>
+
+    <div id="galeria" class="galeria"></div>
+
+    <div class="paginacion">
+        <button onclick="anterior()">Anterior</button>
+        <span id="pagina">1</span>
+        <button onclick="siguiente()">Siguiente</button>
+    </div>
+
+    <p class="nom">
+        <strong>Algunos pokemones para facilitar la busqueda</strong><br>
+        bulbasaur, ivysaur, venusaur, charmander, charmeleon, charizard, squirtle, wartortle, 
+        blastoise, caterpie, metapod, butterfree, weedle, kakuna, beedrill, pidgey, pidgeotto, 
+        pidgeot, rattata, raticate, spearow, fearow, ekans, arbok, pikachu, raichu, sandshrew, 
+        sandslash, nidoran-f, nidorina, nidoqueen, nidoran-m, nidorino, nidoking, clefairy, c
+        lefable, vulpix, ninetales, jigglypuff, wigglytuff, zubat, golbat, oddish, gloom, 
+        vileplume, paras, parasect, venonat, venomoth, diglett, dugtrio, meowth, persian, 
+        psyduck, golduck, mankey, primeape, growlithe, arcanine, poliwag, poliwhirl, 
+        poliwrath, abra, kadabra, alakazam, machop, machoke, machamp, bellsprout, weepinbell, 
+        victreebel, tentacool, tentacruel, geodude, graveler, golem, ponyta, rapidash, slowpoke, 
+        slowbro, magnemite, magneton, farfetchd, doduo, dodrio, seel, dewgong, grimer, muk, 
+        shellder, cloyster, gastly, haunter, gengar, onix, drowzee, hypno, krabby, kingler
+    </p>
+
+    <script>
+        let pagina = 0;
+        const galeria = document.getElementById("galeria");
+        const spanPagina = document.getElementById("pagina");
+
+
+        async function cargarPokemones() {
+            galeria.innerHTML = "<p>Cargando...</p>";
+            const url = `https://pokeapi.co/api/v2/pokemon?limit=20&offset=${pagina * 20}`;
+            try {
+                const res = await fetch(url);
+                const data = await res.json();
+
+                galeria.innerHTML = "";
+
+                for (let poke of data.results) {
+                    const detalle = await fetch(poke.url).then(r => r.json());
+                    const carta = `
+                        <div class="carta">
+                            <p><strong>ID:</strong>${detalle.id}</p>
+                            <p><strong>Nombre:</strong>${detalle.name}</p>
+                            <img src="${detalle.sprites.front_default}" alt="${detalle.name}">
+                        </div>
+                    `;
+                    galeria.innerHTML += carta;
+                }
+
+                spanPagina.textContent = pagina + 1;
+            } catch (error) {
+                galeria.innerHTML = "<p>Error al cargar Pokemon.</p>";
+            }
+        }
+
+        async function buscarPokemon() {
+            const nombre = document.getElementById("filtro").value.toLowerCase();
+            if (!nombre) {
+                cargarPokemones();
+                return;
+            }
+            galeria.innerHTML = "<p>Buscando !!!</p>";
+            try {
+                const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${nombre}`);
+                if (!res.ok) throw new Error("Pokemon no encontrado");
+                const poke = await res.json();
+
+                galeria.innerHTML = `
+                    <div class="carta">
+                        <p>${poke.name}</p>
+                        <img src="${poke.sprites.front_default}" alt="${poke.name}">
+                    </div>
+                `;
+                spanPagina.textContent = "—";
+            } catch (error) {
+                galeria.innerHTML = "<p>No hay el Pokemon.</p>";
+            }
+        }
+        function siguiente() {
+            pagina++;
+            cargarPokemones();
+        }
+        function anterior() {
+            if (pagina > 0) {
+                pagina--;
+                cargarPokemones();
+            }
+        }
+        cargarPokemones();
+    </script>
+</body>
+</html>
